@@ -1,0 +1,124 @@
+---
+title: "shinyapp drafting"
+author: "Adam Billen"
+date: "2024-04-22"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(shiny)
+library(DT)
+library(ggplot2)
+
+baldur <- read.csv("./baldur.csv")
+```
+
+```{r}
+ui <- fluidPage(
+  titlePanel("Companion stats filtered by alignment"),
+  
+  sidebarLayout(
+    sidebarPanel(
+      selectInput("Ethics", "What alignment/ethics are you interested in?", choices = unique(baldur$ethics)),
+      selectInput("Stat", "Which stat are you interested in?", choices = c("str", "dex", "con", "int", "wis", "cha"))
+      ),
+    
+    mainPanel(
+      tabsetPanel(type = "tab",
+                  tabPanel("Table",  dataTableOutput("table")),
+                  tabPanel("Stat plot", plotOutput("plot"))
+      )
+    )
+  )
+)
+
+server <- function(input, output) {
+  
+  
+  baldur_filtered <- reactive({
+    filter(baldur, ethics == input$Ethics)
+  })
+  
+  output$table <- renderDataTable(
+    baldur_filtered()
+  )
+  
+  output$plot <- renderPlot({
+    ggplot(baldur_filtered(), aes_string(x = input$Stat)) +
+      geom_bar() +
+      ggtitle("Barplot filtered by ethics selection")
+  })
+  
+  
+}
+
+shinyApp(ui = ui, server = server)
+```
+Make warrior/priest/etc into a singular qualitative column
+```{r}
+ui <- fluidPage(
+  titlePanel("Companion stats filtered by alignment"),
+  
+  sidebarLayout(
+    sidebarPanel(
+      selectInput("Ethics", 
+                  
+                  "You find a wounded knight on the side of the road. Do you...",
+                  
+                  choices = c("A. Sacrifice my water and bandages to help him" = "Lawful", 
+                              "B. Help him walk town but keep your water" = "Chaotic", 
+                              "C. Rob him and leave him to die" = "Neutral")),
+      
+      selectInput("Class",
+        
+                  "You come across a boulder on the road. Do you...",
+        
+                  choice = c("A. Smash it with your hammer!" = "warrior",
+                             "B. Lift it with your mind and move it from the road." = "wizard",
+                             "C. Pray for God to move it for you." = "priest",
+                             "D. Climb into the trees and navigate over it in the tree cover." = "rogue"
+                  ),
+      
+      selectInput("Stat", "Which stat are you interested in?",
+                  choices = c("str", "dex", "con", "int", "wis", "cha"))
+    )
+    ),
+    
+    mainPanel(
+      tabsetPanel(type = "tab",
+                  tabPanel("Table",  dataTableOutput("table")),
+                  tabPanel("Stat plot", plotOutput("plot"))
+      )
+    )
+  )
+)
+
+server <- function(input, output) {
+  
+  baldur_filtered <- reactive({
+    filter(baldur, ethics == input$Ethics
+           )  
+    })
+  
+  output$table <- renderDataTable(
+    baldur_filtered()
+  )
+  
+  output$plot <- renderPlot({
+    ggplot(baldur_filtered(), aes_string(x = input$Stat)) +
+      geom_bar() +
+      ggtitle("Barplot filtered by ethics selection")
+  })
+  
+  
+}
+
+shinyApp(ui = ui, server = server)
+
+```
+
