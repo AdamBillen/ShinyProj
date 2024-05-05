@@ -1,19 +1,12 @@
----
-title: "Baldur's Gate Select the Best Companion Shiny App"
-author: "Shiny App Dream Team"
-date: "May 5th, 2024"
-output: html_document
----
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+ # Adam Billen, Ogechi Onyewu, Sally Henley 
+ 
 
 ```{r}
 library(tidyverse)
 library(shiny)
 library (shinyWidgets)
-library (shinyui)
+#library (shinyui)
 library(DT)
 library(ggplot2)
 
@@ -38,12 +31,12 @@ ui <- fluidPage(
                   
                   "You come across a village plagued by a deadly disease. The only cure is a rare 
                   herb guarded by a reclusive hermit. What do you do?",
-      
+                  
                   choices = c("A. Immediately seek out the hermit, risking your own safety to save the village" = "Good",
                               "B. Negotiate with the hermit, offering something in return for the herb" = "Neutral",
                               "C. Leave the village to its fate, prioritizing your own interests" = "Evil")
                   
-                  ),
+      ),
       
       sliderInput("str_lower",
                   label = "Select the lower bound of strength",
@@ -95,8 +88,8 @@ ui <- fluidPage(
       
       selectInput("Stat", "Which stat are you interested in?",
                   choices = c("str", "dex", "con", "int", "wis", "cha"))
-
-      ),
+      
+    ),
     
     mainPanel(
       img(src='BaldurScreenshot 2024-05-05.png', align ="right"),
@@ -135,19 +128,19 @@ server <- function(input, output) {
       geom_bar() +
       ggtitle("Barplot filtered by selections")
   })
- output$boxplot <- renderPlot({
+  output$boxplot <- renderPlot({
     ggplot(baldur_filtered(), mapping = aes(x = race, y = .data[[input$Stat]])) +
       geom_boxplot() +
       ggtitle("Boxplot filtered by selections") 
+    
+  })
   
-})
- 
- output$Histogram <- renderPlot({
+  output$Histogram <- renderPlot({
     ggplot(baldur_filtered(), mapping = aes(x = .data[[input$Stat]])) +
       geom_histogram() +
       ggtitle("Histogram filtered by selections")})
- 
-
+  
+  
   output$pie <- renderPlot({
     
     baldurdata1 <- baldur_filtered() %>% group_by(class) %>% summarize(count = n())
@@ -161,11 +154,13 @@ server <- function(input, output) {
       labs(x = NULL, y = NULL, fill = NULL) +
       theme_classic() +
       theme(axis.line = element_blank(),
-          axis.text = element_blank(),
-          axis.ticks = element_blank())
-  
+            axis.text = element_blank(),
+            axis.ticks = element_blank())
+    
   })
 }
 
 shinyApp(ui = ui, server = server)
 ```
+
+
